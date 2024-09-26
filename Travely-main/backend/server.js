@@ -8,9 +8,9 @@ const colors = require("colors");
 const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const chatRoutes = require("./routes/chatRoutes");
-const cookiesession = require('cookie-session')
-const passport = require("passport")
-const passportSetup = require("./passport.js")
+const cookiesession = require("cookie-session");
+const passport = require("passport");
+//const passportSetup = require("./passport.js")
 
 const cors = require("cors");
 //db connection
@@ -19,15 +19,16 @@ connectDB();
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-app.use(cookiesession({
-  name: 'session',
-  keys: ["mali"],
-  maxAge: 24 * 60 * 60 * 100,
-}))
+app.use(
+  cookiesession({
+    name: "session",
+    keys: ["mali"],
+    maxAge: 24 * 60 * 60 * 100,
+  })
+);
 
 app.use(passport.initialize());
-app.use(passport.session())
-
+app.use(passport.session());
 
 app.use(
   cors({
@@ -36,7 +37,6 @@ app.use(
     credentials: true,
   })
 );
-
 
 //to accept body data
 
@@ -70,14 +70,14 @@ app.use("/api/vehicle/images", express.static(path.join(__dirname, "images")));
 app.use("/api/vehiclereservation", reservationRouter);
 
 //chamith
-const hotels = require('./routes/hotels');
-const rooms = require('./routes/rooms');
-const hotelreservation = require('./routes/hotelReservationRoute');
+const hotels = require("./routes/hotels");
+const rooms = require("./routes/rooms");
+const hotelreservation = require("./routes/hotelReservationRoute");
 
-app.use('/api/hotels', hotels);
-app.use('/api/rooms', rooms);
-app.use('/api/hotelreservation', hotelreservation)
-app.use('/api/hotels/images', express.static(path.join(__dirname, 'images')));
+app.use("/api/hotels", hotels);
+app.use("/api/rooms", rooms);
+app.use("/api/hotelreservation", hotelreservation);
+app.use("/api/hotels/images", express.static(path.join(__dirname, "images")));
 
 //navindi
 const restaurantRoute = require("./routes/restaurantRoute.js");
@@ -104,25 +104,22 @@ app.use("/api/seatBookings", seatBookingRouter);
 const flightBookingRouter = require("./routes/SeatBookingFlight");
 app.use("/api/flight", flightBookingRouter);
 
-
 // dinidu
-const refundRouter = require("./routes/RefundRoute")
-app.use("/api/refund", refundRouter)
+const refundRouter = require("./routes/RefundRoute");
+app.use("/api/refund", refundRouter);
 
-const EmployeeRouter = require("./routes/EmployeeRoute")
-app.use("/api/employee", EmployeeRouter)
+const EmployeeRouter = require("./routes/EmployeeRoute");
+app.use("/api/employee", EmployeeRouter);
 
-const SalaryRouter = require("./routes/SalaryRoute")
-app.use("/api/salary", SalaryRouter)
+const SalaryRouter = require("./routes/SalaryRoute");
+app.use("/api/salary", SalaryRouter);
 
-const RecordRouter = require("./routes/FinanceHealth")
-app.use("/api/record", RecordRouter)
-
+const RecordRouter = require("./routes/FinanceHealth");
+app.use("/api/record", RecordRouter);
 
 //hansika
 const ActivityRoute = require("./routes/activityRoute");
 const ReservationRoute = require("./routes/reservationRoute.js");
-
 
 app.use("/api/activities", ActivityRoute);
 app.use("/api/reservations", ReservationRoute);
