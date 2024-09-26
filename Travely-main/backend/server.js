@@ -9,12 +9,11 @@ const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 
+//add cors to fix cross-domain misconfiguration
 const cors = require("cors");
-
 const corsOptions = {
   origin: ["http://localhost:3000"],
 };
-
 app.use(cors(corsOptions));
 
 //db connection
