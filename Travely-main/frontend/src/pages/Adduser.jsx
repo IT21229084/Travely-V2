@@ -26,6 +26,43 @@ const Adduser = () => {
   const passwordPattern = /^[a-zA-Z0-9!@#$%^&*]{8,}$/; // At least 8 characters
   const specialCharPattern = /[<>%$]/; // Special characters to prevent
 
+  // Allowed file types and max size (e.g., 5MB)
+  const allowedFileTypes = ["image/jpeg", "image/png", "image/gif"];
+  const maxFileSize = 5 * 1024 * 1024; // 5MB
+  //const maxFileSize = 1 * 1024; // 1KB
+
+  const handleFileChange = (e) => {
+    const uploadedFile = e.target.files[0];
+
+    if (!uploadedFile) {
+      return;
+    }
+    const maxFileSize = 1 * 1024; // 1KB
+
+    // Check file size
+    if (uploadedFile.size > maxFileSize) {
+      Swal.fire({
+        icon: "error",
+        title: "File Too Large",
+        text: "File size should not exceed 1KB for testing.",
+      });
+      return;
+    }
+
+    // Check file type
+    if (!allowedFileTypes.includes(uploadedFile.type)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid File Type",
+        text: "Please upload a valid image file (JPEG, PNG, GIF).",
+      });
+      return;
+    }
+
+    // Set the file if all validations pass
+    setFile(uploadedFile);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -338,11 +375,7 @@ const Adduser = () => {
                 name="file"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setFile(e.target.files[0]);
-                  }
-                }}
+                onChange={handleFileChange}
               />
             </div>
 
