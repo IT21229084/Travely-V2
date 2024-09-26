@@ -41,8 +41,14 @@ const UserSchema = new mongoose.Schema(
       default:
         "https://icon-library.com/images/no-image-icon/no-image-icon-0.jpg",
     },
+    loginAttempts: { type: Number, default: 0 }, // Track failed attempts
+    lockUntil: { type: Date }, // Lock time
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+UserSchema.methods.isLocked = function () {
+  return this.lockUntil && this.lockUntil > Date.now();
+}
 
 module.exports = mongoose.model("User", UserSchema);

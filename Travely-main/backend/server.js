@@ -8,6 +8,9 @@ const colors = require("colors");
 const userRoutes = require("./routes/userRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const chatRoutes = require("./routes/chatRoutes");
+const cookiesession = require("cookie-session");
+const passport = require("passport");
+const passportSetup = require("./passport.js");
 
 //add cors to fix cross-domain misconfiguration
 const cors = require("cors");
@@ -22,9 +25,13 @@ connectDB();
 app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
+app.use(cors());
+
 //to accept body data
 
 //to use json
+
+//my part
 
 //middlewares
 
