@@ -41,6 +41,37 @@ const registerUser = async (req, res, next) => {
 // @desc    Login user
 // @route   POST /api/login
 // @access  Public
+// const loginUser = async (req, res, next) => {
+//   try {
+//     const user = await User.findOne({ email: req.body.email });
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
+
+//     const isMatch = await bcrypt.compare(req.body.password, user.password);
+
+//     if (!isMatch) {
+//       return res.status(404).send("wrong password");
+//     }
+
+//     //create the token
+//     const token = jwt.sign(
+//       { id: user, isAdmin: user.isAdmin },
+//       process.env.JWT
+//     );
+
+//     const { password, isAdmin, ...otherDetails } = user._doc;
+//     res
+//       .cookie("access_token", token, {
+//         httpOnly: true,
+//       })
+//       .status(200)
+//       .json({ details: { ...otherDetails }, isAdmin, token });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
 const loginUser = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
@@ -48,15 +79,34 @@ const loginUser = async (req, res, next) => {
       return res.status(404).send("User not found");
     }
 
+    // Check if the account is locked
+    if (user.isLocked()) {
+      return res.status(403).json({ message: "Your account is locked. Try again later." });
+    }
+
     const isMatch = await bcrypt.compare(req.body.password, user.password);
 
     if (!isMatch) {
-      return res.status(404).send("wrong password");
+      user.loginAttempts += 1;
+
+      if (user.loginAttempts >= 3) {
+        // Lock the account for 15 minutes
+        user.lockUntil = Date.now() + 15 * 60 * 1000; // 15 minutes
+        user.loginAttempts = 0; // Reset after lock
+      }
+
+      await user.save();
+      return res.status(401).json({ message: "Wrong password." });
     }
 
-    //create the token
+    // Reset login attempts on successful login
+    user.loginAttempts = 0;
+    user.lockUntil = undefined;
+    await user.save();
+
+    // Create the token
     const token = jwt.sign(
-      { id: user, isAdmin: user.isAdmin },
+      { id: user._id, isAdmin: user.isAdmin },
       process.env.JWT
     );
 
@@ -71,6 +121,10 @@ const loginUser = async (req, res, next) => {
     next(error);
   }
 };
+
+
+
+
 
 // @desc    Logout user
 // @route   POST /api/logout
