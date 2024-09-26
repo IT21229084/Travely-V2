@@ -6,12 +6,17 @@ import { Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import backgroundImage from "../assets/images/bg.jpg";
 import Spinner from "../components/spinner/LoadingSpinner";
+import Google from "../img/google.png";
 
 const Login = () => {
   const [credentials, setCredentials] = useState({
     email: undefined,
     password: undefined,
   });
+
+  const google = () => {
+    window.open("http://localhost:5000/api/auth/google", "_self");
+  };
 
   const [loading2, setLoading2] = useState(false);
 
@@ -23,33 +28,75 @@ const Login = () => {
     setCredentials((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
+  // const handleClick = async (e) => {
+  //   e.preventDefault();
+  //   dispatch({ type: "LOGIN_START" });
+
+  //   if (!credentials.email || !credentials.password) {
+  //     Swal.fire("Please enter your email and password", "", "error");
+  //   }
+  //   if (!/\S+@\S+\.\S+/.test(credentials.email)) {
+  //     Swal.fire("Please enter a valid email address", "", "error");
+  //   }
+  //   try {
+  //     setLoading2(true);
+  //     const res = await axios.post("auth/login", credentials);
+  //     dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
+  //     setLoading2(false);
+  //     if (res.data.isAdmin === true) {
+  //       navigate("/admin");
+  //     } else if (res.data.details.type == "financeManager") {
+  //       navigate("/finance");
+  //     } else if (res.data.isAdmin === false) {
+  //       navigate("/");
+  //     }
+  //   } catch (err) {
+  //     dispatch({ type: "LOGIN_FAILURE", payload: err.response.data });
+  //     setTimeout(() => {
+  //       Swal.fire(err.response.data, "", "error");
+  //     }, 2000);
+  //   }
+  // };
+
+
   const handleClick = async (e) => {
     e.preventDefault();
-    dispatch({ type: "LOGIN_START" });
 
+    // Validate credentials before making request
     if (!credentials.email || !credentials.password) {
-      Swal.fire("Please enter your email and password", "", "error");
+      return Swal.fire("Please enter your email and password", "", "error");
     }
     if (!/\S+@\S+\.\S+/.test(credentials.email)) {
-      Swal.fire("Please enter a valid email address", "", "error");
+      return Swal.fire("Please enter a valid email address", "", "error");
     }
+
+    dispatch({ type: "LOGIN_START" });
     try {
       setLoading2(true);
+
       const res = await axios.post("auth/login", credentials);
+
       dispatch({ type: "LOGIN_SUCCESS", payload: res.data.details });
       setLoading2(false);
+
+      // Redirect based on user role
       if (res.data.isAdmin === true) {
         navigate("/admin");
-      } else if (res.data.details.type == "financeManager") {
+      } else if (res.data.details.type === "financeManager") {
         navigate("/finance");
       } else if (res.data.isAdmin === false) {
         navigate("/");
       }
     } catch (err) {
+      setLoading2(false);
       dispatch({ type: "LOGIN_FAILURE", payload: err.response.data });
-      setTimeout(() => {
-        Swal.fire(err.response.data, "", "error");
-      }, 2000);
+
+      // Check for specific account lock status (403) or other errors
+      if (err.response.status === 403) {
+        Swal.fire("Your account is locked. Try again later.", "", "error");
+      } else {
+        Swal.fire(err.response.data.message || "An error occurred during login", "", "error");
+      }
     }
   };
 
@@ -102,6 +149,10 @@ const Login = () => {
                   </div>
                 </form>
                 {loading && <Spinner />}
+                <div className="loginButton google" onClick={google}>
+                  <img src={Google} alt="" className="icon" />
+                  Google
+                </div>
 
                 <Link
                   to="/reset-password"
