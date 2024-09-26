@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../components/spinner/LoadingSpinner";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 const Adduser = () => {
   const [loading2, setLoading2] = useState(false);
@@ -23,8 +23,45 @@ const Adduser = () => {
   const namePattern = /^[a-zA-Z\s]*$/; // Only letters and spaces
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const mobilePattern = /^[0-9]{10}$/; // 10-digit number
-  const passwordPattern = /^[a-zA-Z0-9!@#$%^&*]{6,}$/; // At least 6 characters
+  const passwordPattern = /^[a-zA-Z0-9!@#$%^&*]{8,}$/; // At least 8 characters
   const specialCharPattern = /[<>%$]/; // Special characters to prevent
+
+  // Allowed file types and max size (e.g., 5MB)
+  const allowedFileTypes = ["image/jpeg", "image/png", "image/gif"];
+  const maxFileSize = 5 * 1024 * 1024; // 5MB
+  //const maxFileSize = 1 * 1024; // 1KB
+
+  const handleFileChange = (e) => {
+    const uploadedFile = e.target.files[0];
+
+    if (!uploadedFile) {
+      return;
+    }
+    const maxFileSize = 1 * 1024; // 1KB
+
+    // Check file size
+    if (uploadedFile.size > maxFileSize) {
+      Swal.fire({
+        icon: "error",
+        title: "File Too Large",
+        text: "File size should not exceed 1KB for testing.",
+      });
+      return;
+    }
+
+    // Check file type
+    if (!allowedFileTypes.includes(uploadedFile.type)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid File Type",
+        text: "Please upload a valid image file (JPEG, PNG, GIF).",
+      });
+      return;
+    }
+
+    // Set the file if all validations pass
+    setFile(uploadedFile);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -70,7 +107,7 @@ const Adduser = () => {
       Swal.fire({
         icon: "error",
         title: "Invalid Password",
-        text: "Password must be at least 6 characters long and can include letters, numbers, and special characters (!@#$%^&*).",
+        text: "Password must be at least 8 characters long and can include letters, numbers, and special characters (!@#$%^&*).",
       });
       return;
     }
@@ -101,7 +138,11 @@ const Adduser = () => {
     }
 
     // Check for Potential XSS Attacks
-    if (xssPattern.test(name) || xssPattern.test(email) || xssPattern.test(country)) {
+    if (
+      xssPattern.test(name) ||
+      xssPattern.test(email) ||
+      xssPattern.test(country)
+    ) {
       Swal.fire({
         icon: "error",
         title: "Invalid Input",
@@ -321,7 +362,10 @@ const Adduser = () => {
 
             {/* File Upload */}
             <div className="text-center">
-              <label htmlFor="file" className="cursor-pointer flex items-center justify-center gap-2">
+              <label
+                htmlFor="file"
+                className="cursor-pointer flex items-center justify-center gap-2"
+              >
                 Click here to add a profile picture
                 <DriveFolderUploadOutlinedIcon />
               </label>
@@ -331,11 +375,7 @@ const Adduser = () => {
                 name="file"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    setFile(e.target.files[0]);
-                  }
-                }}
+                onChange={handleFileChange}
               />
             </div>
 

@@ -59,11 +59,24 @@ const Register = () => {
       });
       return;
     }
-    if (password.length <= 6) {
+    // if (password.length <= 6) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Oops...",
+    //     text: "password must at least have 6 charaters",
+    //   });
+    //   return;
+    // }
+
+    // Strong password validation using regex
+    const strongPasswordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
+    if (!strongPasswordRegex.test(password)) {
       Swal.fire({
         icon: "error",
-        title: "Oops...",
-        text: "password must at least have 6 charaters",
+        title: "Weak Password",
+        text: "Password must be at least 8 characters long, and include an uppercase letter, a lowercase letter, a number, and a special character.",
       });
       return;
     }

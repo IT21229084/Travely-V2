@@ -13,11 +13,11 @@ const passport = require("passport");
 const passportSetup = require("./passport.js");
 
 //add cors to fix cross-domain misconfiguration
-const cors = require("cors");
-const corsOptions = {
-  origin: ["http://localhost:3000"],
-};
-app.use(cors(corsOptions));
+// const cors = require("cors");
+// const corsOptions = {
+//   origin: ["http://localhost:3000"],
+// };
+// app.use(cors(corsOptions));
 
 //db connection
 const connectDB = require("./config/db");
@@ -26,6 +26,24 @@ app.use(express.json({ limit: "50mb", extended: true }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
 app.use(cors());
+app.use(
+  cookiesession({
+    name: "session",
+    keys: ["mali"],
+    maxAge: 24 * 60 * 60 * 100,
+  })
+);
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+  })
+);
 
 //to accept body data
 
