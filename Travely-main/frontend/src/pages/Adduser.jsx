@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import Spinner from "../components/spinner/LoadingSpinner";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 
 const Adduser = () => {
   const [loading2, setLoading2] = useState(false);
@@ -23,7 +23,7 @@ const Adduser = () => {
   const namePattern = /^[a-zA-Z\s]*$/; // Only letters and spaces
   const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   const mobilePattern = /^[0-9]{10}$/; // 10-digit number
-  const passwordPattern = /^[a-zA-Z0-9!@#$%^&*]{6,}$/; // At least 6 characters
+  const passwordPattern = /^[a-zA-Z0-9!@#$%^&*]{8,}$/; // At least 8 characters
   const specialCharPattern = /[<>%$]/; // Special characters to prevent
 
   const handleSubmit = async (e) => {
@@ -70,7 +70,7 @@ const Adduser = () => {
       Swal.fire({
         icon: "error",
         title: "Invalid Password",
-        text: "Password must be at least 6 characters long and can include letters, numbers, and special characters (!@#$%^&*).",
+        text: "Password must be at least 8 characters long and can include letters, numbers, and special characters (!@#$%^&*).",
       });
       return;
     }
@@ -101,7 +101,11 @@ const Adduser = () => {
     }
 
     // Check for Potential XSS Attacks
-    if (xssPattern.test(name) || xssPattern.test(email) || xssPattern.test(country)) {
+    if (
+      xssPattern.test(name) ||
+      xssPattern.test(email) ||
+      xssPattern.test(country)
+    ) {
       Swal.fire({
         icon: "error",
         title: "Invalid Input",
@@ -321,7 +325,10 @@ const Adduser = () => {
 
             {/* File Upload */}
             <div className="text-center">
-              <label htmlFor="file" className="cursor-pointer flex items-center justify-center gap-2">
+              <label
+                htmlFor="file"
+                className="cursor-pointer flex items-center justify-center gap-2"
+              >
                 Click here to add a profile picture
                 <DriveFolderUploadOutlinedIcon />
               </label>
