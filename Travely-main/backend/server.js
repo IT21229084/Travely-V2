@@ -10,7 +10,7 @@ const messageRoutes = require("./routes/messageRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const cookiesession = require("cookie-session");
 const passport = require("passport");
-//const passportSetup = require("./passport.js")
+const passportSetup = require("./passport.js");
 
 const cors = require("cors");
 //db connection
