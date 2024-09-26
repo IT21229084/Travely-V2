@@ -44,6 +44,25 @@ const Profileupdate = () => {
   const [mobile, setMobile] = useState(state.mobile);
   const [file, setFile] = useState("");
 
+  //country input field check func
+  const handleCountryChange = (event) => {
+    const input = event.target.value;
+    const lettersOnly = input.replace(/[^A-Za-z\s\u00C0-\u017F]/g, "");
+    setCountry(lettersOnly);
+  };
+  //Name input field check func
+  const handleNameChange = (event) => {
+    const input = event.target.value;
+    const lettersOnly = input.replace(/[^A-Za-z\s\u00C0-\u017F]/g, "");
+    setName(lettersOnly);
+  };
+  //Mobile input field check func
+  const handleMobileChange = (event) => {
+    const input = event.target.value;
+    const numbersOnly = input.replace(/[^\d]/g, "");
+    setMobile(numbersOnly);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -170,7 +189,7 @@ const Profileupdate = () => {
                 />
               </label>
             </div>
-            <div>
+            {/* <div>
               <label className="flex flex-col w-full">
                 <span className="pb-1 font-bold">Name:</span>
                 <input
@@ -180,8 +199,21 @@ const Profileupdate = () => {
                   onChange={(event) => setName(event.target.value)}
                 />
               </label>
-            </div>
+            </div> */}
             <div>
+              <label className="flex flex-col items-start">
+                <span className="pb-1 font-bold">Name:</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={handleNameChange}
+                  className="px-2 py-2 w-full placeholder-slate-300 text-slate-600 relative bg-white rounded-lg text-sm border border-slate-300 outline-none focus:outline-none focus:ring"
+                  placeholder="Enter country name"
+                />
+              </label>
+            </div>
+
+            {/* <div>
               <label className="flex flex-col">
                 <span className="pb-1 font-bold">Country:</span>
                 <input
@@ -191,6 +223,18 @@ const Profileupdate = () => {
                   className="px-2 py-2 placeholder-slate-300 text-slate-600 relative bg-white rounded-lg text-sm border border-slate-300 outline-none focus:outline-none focus:ring"
                 />
               </label>
+            </div> */}
+            <div>
+              <label className="flex flex-col items-start">
+                <span className="pb-1 font-bold">Country:</span>
+                <input
+                  type="text"
+                  value={country}
+                  onChange={handleCountryChange}
+                  className="px-2 py-2 w-full placeholder-slate-300 text-slate-600 relative bg-white rounded-lg text-sm border border-slate-300 outline-none focus:outline-none focus:ring"
+                  placeholder="Enter country name"
+                />
+              </label>
             </div>
             <div>
               <label className="flex flex-col">
@@ -198,7 +242,7 @@ const Profileupdate = () => {
                 <input
                   type="text"
                   value={mobile}
-                  onChange={(event) => setMobile(event.target.value)}
+                  onChange={handleMobileChange}
                   className="px-2 py-2 rounded-lg placeholder-slate-300 text-slate-600 relative bg-white text-sm border border-slate-300 outline-none focus:outline-none focus:ring"
                 />
               </label>
