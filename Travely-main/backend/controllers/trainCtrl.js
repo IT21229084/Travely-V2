@@ -1,3 +1,7 @@
+// npm install express-session
+// npm install express multer express-validator mongoose
+
+const { body, validationResult } = require('express-validator');
 const multer = require("multer");
 const Train = require("../models/Train");
 const path = require("path");
@@ -25,27 +29,96 @@ const upload = multer({
   ]);
 
 // add a train admin
-const addTrain = async(req,res)=>{
-    try {
-        upload(req,res,async(err)=>{
-            if(err){
-                console.log(err.message);
-                return res.status(500).json({message:"error in uploading"})
+//const addTrain = async(req,res)=>{
+//    try {
+//        upload(req,res,async(err)=>{
+//            if(err){
+//                console.log(err.message);
+//                return res.status(500).json({message:"error in uploading"})
+//            }
+//
+//            const newTrain = new Train({
+//                ...req.body,
+//               // trainMainImg : req.files.trainMainImg[0].filename
+//            })
+//
+//            await newTrain.save();
+//            res.status(200).json(newTrain);
+//        });
+//    } catch(err){
+//        console.log(err);
+//        res.status(500).json({message : err.message})
+//    }
+//}
+
+// Add a train (admin)
+const addTrain = [
+    // Validation and sanitization of inputs
+    body('trainName').trim().escape().notEmpty().withMessage('Train name is required.'),
+    body('from').trim().escape().notEmpty().withMessage('Origin is required.'),
+    body('to').trim().escape().notEmpty().withMessage('Destination is required.'),
+    body('arrivalTime').trim().escape().notEmpty().withMessage('Arrival time is required.'),
+    body('departureTime').trim().escape().notEmpty().withMessage('Departure time is required.'),
+    body('date').trim().escape().isISO8601().withMessage('Valid date is required.'),
+    body('price').trim().escape().isNumeric().withMessage('Price must be a number.'),
+    body('noOfSeats').trim().escape().isInt({ min: 1, max: 100 }).withMessage('Number of seats must be a positive integer and cannot exceed 100.'),
+    body('description').trim().escape().notEmpty().withMessage('Description is required.'),
+    body('MaxBagage').trim().escape().isInt({ min: 0 }).withMessage('Max baggage must be a non-negative integer.'),
+    body('classType').trim().escape().notEmpty().withMessage('Class type is required.'),
+    body('cancelCharges').trim().escape(),
+
+    async (req, res) => {
+        try {
+            // Check for validation errors
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                console.log(errors.array()); // Log the validation errors for debugging
+                return res.status(400).json({ errors: errors.array() });
             }
 
-            const newTrain = new Train({
-                ...req.body,
-               // trainMainImg : req.files.trainMainImg[0].filename
-            })
+            // CSRF token validation
+            const csrfToken = req.headers['csrf-token'];
+            // Implement CSRF validation logic 
 
-            await newTrain.save();
-            res.status(200).json(newTrain);
-        });
-    } catch(err){
-        console.log(err);
-        res.status(500).json({message : err.message})
+            upload(req, res, async (err) => {
+                if (err) {
+                    console.log(err.message);
+                    return res.status(500).json({ message: "Error in uploading" });
+                }
+
+                // Create a new train with sanitized inputs
+                const noOfSeats = parseInt(req.body.noOfSeats, 10); // Ensure noOfSeats is an integer
+                if (noOfSeats > 100) {
+                    return res.status(400).json({ message: "Number of seats cannot exceed 100." });
+                }
+
+                const newTrain = new Train({
+                    trainName: req.body.trainName,
+                    from: req.body.from,
+                    to: req.body.to,
+                    arrivalTime: req.body.arrivalTime,
+                    departureTime: req.body.departureTime,
+                    date: req.body.date,
+                    price: parseFloat(req.body.price), // Ensure price is a number
+                    noOfSeats: noOfSeats, // Use the validated noOfSeats
+                    description: req.body.description,
+                    trainMainImg: req.files?.trainMainImg[0]?.filename || null, 
+                    MaxBagage: parseInt(req.body.MaxBagage, 10), // Ensure MaxBagage is an integer
+                    classType: req.body.classType,
+                    cancelCharges: req.body.cancelCharges
+                });
+
+                // Save the new train to the database
+                await newTrain.save();
+                res.status(200).json(newTrain);
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(500).json({ message: err.message });
+        }
     }
-}
+];
+
 
 // get all trains admin -- just for now
 const getAllTrains = async(req,res)=>{
