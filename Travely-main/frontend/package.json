@@ -22,7 +22,7 @@
     "font-awesome-icons": "^1.6.0",
     "formik": "^2.2.9",
     "js-cookie": "^3.0.5",
-    "jspdf": "^2.5.1",
+    "jspdf": "^3.0.2",
     "jspdf-autotable": "^3.5.28",
     "jwt-decode": "^3.1.2",
     "moment": "^2.29.4",
